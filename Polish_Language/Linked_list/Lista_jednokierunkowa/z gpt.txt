@@ -1,0 +1,343 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <limits>
+
+using namespace std;
+
+
+//struktura pojedynczego elementu listy
+struct element
+{
+    int number;
+    element *next;
+};
+
+//struktura ogolna listy (poczatek i koniec + licznik)
+struct single_list
+{
+    int counter;
+    element *head;
+    element *tail;
+};
+
+
+void czyPusta(single_list list_f);
+int dodajElement();
+int dodajPozElementu(single_list list_f);
+void dodanieNaKoniec(single_list &list_f);
+void dodanieNaPoczatek(single_list &list_f);
+void dodanieNaPozycje(single_list &list_f);
+void usuniecieZKonca(single_list &list_f);
+void usuniecieZPoczatku(single_list &list_f);
+void usuniecieZPozycji(single_list &list_f);
+void sredniaArytmetyczna(single_list list_f);
+void elMax(single_list list_f);
+void wyswietlListe(single_list list_f);
+void wyjscieZProgramu(single_list &list_f);
+
+
+
+int main()
+{
+    int opcja = 0;
+    single_list lista;
+    lista.tail = nullptr;
+    lista.head = nullptr;
+    lista.counter = 0;
+    string check;
+
+    while (true)
+    {
+         cout << "Wybierz jedna z opcji" << endl
+              << "1 - Dodanie elementu na koniec listy." << endl
+              << "2 - Dodanie elementu na poczatek listy." << endl
+              << "3 - Dodanie elementu na okreslona pozycje." << endl
+              << "4 - Usuniecie elementu z konca listy." << endl
+              << "5 - Usuniecie elementu z poczatku listy." << endl
+              << "6 - Usuniecie elementu z okreslonej pozycji." << endl
+              << "7 - Srednia arytmetyczna elementow w liscie." << endl
+              << "8 - Znalezienie elementu maksyalnego w liscie." << endl
+              << "9 - Wyswietlenie calej listy." << endl
+              << "10 - Wyjscie z programu" << endl;
+
+        cout << "Podaj opcje: ";
+        cin >> opcja;
+        cout << endl << endl;
+
+        
+        if(cin.fail())
+        {
+            cout << "Podana niepoprawna opcja." << endl << endl;
+            //resetowanie flagi bledow strumienia wejscia
+            cin.clear();
+            //usuwanie niepoprawnych danych ze strumienia wejscia
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+
+        switch (opcja)
+        {
+            case 1: cout << "Dodanie elementu na koniec listy." << endl << endl; dodanieNaKoniec(lista); break;
+            case 2: cout << "Dodanie elementu na poczatek listy." << endl << endl; dodanieNaPoczatek(lista); break;
+            case 3: cout << "Dodanie elementu na okreslona pozycje." << endl << endl; dodanieNaPozycje(lista); break;
+            case 4: cout << "Usuniecie elementu z konca listy." << endl << endl; usuniecieZKonca(lista); break;
+            case 5: cout << "Usuniecie elementu z poczatku listy." << endl << endl; usuniecieZPoczatku(lista); break;
+            case 6: cout << "Usuniecie elementu z okreslonej pozycji." << endl << endl; usuniecieZPozycji(lista); break;
+            case 7: cout << "Srednia arytmetyczna elementow w liscie." << endl << endl; sredniaArytmetyczna(lista); break;
+            case 8: cout << "Znalezienie elementu maksyalnego w liscie." << endl << endl; elMax(lista); break;
+            case 9: cout << "Wyswietlenie calej listy." << endl << endl; wyswietlListe(lista); break;
+            case 10: cout << "Wyjscie z programu" << endl << endl; wyjscieZProgramu(lista); break;
+            default: cout << "Podana zla opcja" << endl << endl; continue;
+        }
+        czyPusta(lista);
+    }
+}
+
+
+
+void czyPusta(single_list list_f)
+{
+    if(list_f.counter < 1)
+        cout << "Lista jest Pusta." << endl << endl;
+}
+
+
+
+int dodajElement()
+{
+    srand(time(nullptr));
+    int nowy_element = rand()%(51)+1;
+    return nowy_element;
+}
+
+
+
+int dodajPozElementu(single_list list_f)
+{
+    int poz_el;
+    while(true)
+    {
+        cout << "Podaj pozycje: ";
+        cin  >> poz_el;
+        if((poz_el > 0) && (poz_el <= list_f.counter))
+        {
+            cout << endl;
+            return poz_el;
+        }
+        cout << "Podana zla pozycja." << endl;
+    }
+}
+
+
+
+void wyswietlListe(single_list list_f)
+{
+    if(list_f.counter < 1)
+        return;
+
+    element *tmp_f = list_f.head;
+
+    for(int i = 0; i < list_f.counter; i++)
+    {
+        cout << tmp_f -> number;
+        if(i < list_f.counter - 1)
+            cout << ", ";
+
+        tmp_f = tmp_f -> next;
+    }
+    cout << endl;
+}
+
+
+
+void dodanieNaKoniec(single_list &list_f)
+{
+   element *element_f = new element;
+   int liczba = dodajElement();
+
+    element_f -> number = liczba;
+    element_f -> next = nullptr;
+
+    if(list_f.tail != nullptr)
+        list_f.tail -> next = element_f;
+    else
+        list_f.head = element_f;
+
+    list_f.tail = element_f;
+    list_f.counter++;
+}
+
+
+
+void dodanieNaPoczatek(single_list &list_f)
+{
+    element *element_f = new element;
+    int liczba = dodajElement();
+    element_f -> number = liczba;
+    element_f -> next = list_f.head;
+    list_f.head = element_f;
+
+    if(list_f.tail == nullptr)
+    {
+        list_f.tail = element_f;
+    }
+    list_f.counter++;
+}
+
+
+
+void dodanieNaPozycje(single_list &list_f)
+{
+    //sprawdzenie, czy lista jest pusta
+    if(list_f.counter == 0)
+    {
+        cout << "Lista jest pusta, dlatego element zostaje dodany na pierwsza pozycje." << endl << endl;
+        dodanieNaPoczatek(list_f);
+    }
+    else
+    {
+        element *element_f = new element;
+        int liczba = dodajElement();
+        int pozycja = dodajPozElementu(list_f);
+
+        element_f -> number = liczba;
+        element *tmp_f = list_f.head;
+
+        for(int i = 1; i < pozycja - 1; i++)
+            tmp_f = tmp_f -> next;
+
+        element_f -> next = tmp_f -> next;
+        tmp_f -> next = element_f;
+        list_f.counter++;
+    }
+}
+
+
+
+void usuniecieZKonca(single_list &list_f)
+{
+    if(list_f.counter < 1)
+        return;
+
+    if(list_f.counter == 1)
+    {
+        list_f.tail = nullptr;
+        list_f.head = nullptr;
+    }
+    else
+    {
+        element *tmp_f = list_f.head;
+
+        for(int i = 1; i < list_f.counter; i++)
+            tmp_f = tmp_f -> next;
+
+        list_f.tail = tmp_f;
+        list_f.tail -> next = nullptr;
+        delete tmp_f;
+    }
+    list_f.counter--;
+}
+
+
+
+void usuniecieZPoczatku(single_list &list_f)
+{
+    if(list_f.counter < 1)
+        return;
+
+    element *tmp_f = list_f.head;
+    list_f.head = list_f.head -> next;
+
+    if(list_f.counter == 1)
+        list_f.tail = nullptr;
+
+    list_f.counter--;
+    delete tmp_f;
+}
+
+
+
+void usuniecieZPozycji(single_list &list_f)
+{
+    if(list_f.counter < 1)
+        return;
+
+    if(list_f.counter == 1)
+        usuniecieZPoczatku(list_f);
+    else
+    {
+        int pozycja = dodajPozElementu(list_f);
+        element *poprzedni = list_f.head;
+
+        for(int i = 1; i < pozycja - 1; i++)
+            poprzedni = poprzedni -> next;
+
+        element *tmp_f = poprzedni -> next;
+        poprzedni -> next = tmp_f -> next;
+        list_f.counter--;
+        delete tmp_f;
+    }
+}
+
+
+
+void sredniaArytmetyczna(single_list list_f)
+{
+    if(list_f.counter < 1)
+        return;
+
+    int i;
+    double razem = 0, srednia;
+    element *tmp_f = list_f.head;
+
+    for (i = 0; i < list_f.counter; i++) {
+        razem += tmp_f->number;
+
+        tmp_f = tmp_f->next;
+    }
+    srednia = ((razem * 1.0) / (i * 1.0));
+    cout << "Srednia wynosi: " << srednia << endl << endl;
+}
+
+
+
+void elMax(single_list list_f)
+{
+    if(list_f.counter < 1)
+        return;
+
+    element *tmp_f = list_f.head;
+    int max_el = 0, max_poz = 0;
+
+    for (int i = 0; i < list_f.counter; i++)
+    {
+        if(max_el < tmp_f -> number)
+        {
+            max_el = tmp_f -> number;
+            max_poz++;
+        }
+        tmp_f = tmp_f-> next;
+    }
+    cout << "Element maksymalny wynosi " << max_el << ". Znajduje sie on na " << max_poz << " pozycji liczac od poczatku listy." << endl << endl;
+}
+
+
+
+void wyjscieZProgramu(single_list &list_f)
+{
+    //usuwanie listy
+    element *zm_usuwajaca = list_f.head;
+    for(int i = 0; i < list_f.counter; i++)
+    {
+        element *kolejny = zm_usuwajaca -> next;
+        delete zm_usuwajaca;
+        zm_usuwajaca = kolejny;
+    }
+    list_f.head = nullptr;
+    list_f.tail = nullptr;
+    delete list_f.head;
+    delete list_f.tail;
+
+    exit(0);
+}
